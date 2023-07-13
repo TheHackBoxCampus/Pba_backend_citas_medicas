@@ -17,7 +17,8 @@ __decorate([
     Expose({ name: "especialidad" }),
     Transform(({ value }) => {
         if (typeof value != "string")
-            throw ({ status: 500, message: "Parametros incorectos" });
+            throw ({ status: 500, message: "Parametros incorrectos" });
+        return value;
     }, { toClassOnly: true }),
     __metadata("design:type", String)
 ], especialidad.prototype, "esp", void 0);

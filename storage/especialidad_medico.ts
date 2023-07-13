@@ -3,7 +3,8 @@ import { Transform, Expose} from "class-transformer";
 class especialidad {
     @Expose({name: "especialidad"})
     @Transform(({value}) => {
-        if(typeof value  != "string") throw ({status: 500, message: "Parametros incorectos"})
+        if(typeof value  != "string") throw ({status: 500, message: "Parametros incorrectos"})
+        return value;
     }, {toClassOnly : true})
     esp: string
 
