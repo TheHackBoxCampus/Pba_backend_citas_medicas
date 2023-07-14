@@ -1,4 +1,4 @@
-import { Transform, Expose } from "class-transformer";
+import { Transform, Expose, Exclude } from "class-transformer";
 
 class paciente {
   @Expose({ name: "nombre" })
@@ -91,16 +91,9 @@ class paciente {
     { toClassOnly: true }
   )
   ugn: number;
+  @Exclude( {toPlainOnly: true} )
   @Expose({ name: "acudiente" })
-  @Transform(
-    ({ value }) => {
-      if (typeof value != "number")
-        throw { status: 400, message: "Parametros Incorrectos" };
-      return value;
-    },
-    { toClassOnly: true }
-  )
-  uac: number;
+  uac?: number;
   constructor(
     uName: string,
     usgnName: string,
@@ -111,7 +104,7 @@ class paciente {
     uddrs: string,
     uTD: number,
     ugn: number,
-    uac: number
+    uac?: number
   ) {
     this.uName = uName;
     this.usgnName = usgnName;
@@ -124,6 +117,12 @@ class paciente {
     this.ugn = ugn;
     this.uac = uac;
   }
+  
+    valdUac():number {
+       if(!this.uac) return;
+       if(typeof this.uac != "number") {throw {status: 400, message: "Parametros Incorrectos"}}
+       else {return this.uac}
+   }
 }
 
 export default paciente;

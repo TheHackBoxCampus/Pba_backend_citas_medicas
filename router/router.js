@@ -234,6 +234,10 @@ router.post("/paciente/nuevo", md_paciente, (req, res) => {
     INSERT INTO usuario(usu_nombre, usu_segdo_nombre, usu_primero_apellido, usu_segdo_apellido, usu_telefono, usu_direccion, usu_email, usu_tipodoc, usu_genero, usu_acudiente)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
+  let insertNewPatientlegal = /* sql */ `
+    INSERT INTO usuario(usu_nombre, usu_segdo_nombre, usu_primero_apellido, usu_segdo_apellido, usu_telefono, usu_direccion, usu_email, usu_tipodoc, usu_genero)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
   let searchAge = /* sql */ `SELECT tipodoc_id as id FROM tipo_documento`;
   connection.query(searchAge, (err, results) => {
     if (err) res.send(err);
@@ -248,39 +252,43 @@ router.post("/paciente/nuevo", md_paciente, (req, res) => {
       }
 
       if (minor) {
-        let searchAc = /* sql */ `SELECT acu_codigo AS id FROM acudiente`;
-        connection.query(searchAc, (err, results) => {
-          if (err) res.status(500).send(err);
-          else {
-            let exist = false;
-            for (let x = 0; x < results.length; x++) {
-              if (results[x].id == data["uac"]) {
-                exist = true;
+        if(data['uac'] == undefined) {
+          res.status(500).send({message: "Eres menor de edad, Escribe a tu acudiente"})
+        }else {
+          let searchAc = /* sql */ `SELECT acu_codigo AS id FROM acudiente`;
+          connection.query(searchAc, (err, results) => {
+            if (err) res.status(500).send(err);
+            else {
+              let exist = false;
+              for (let x = 0; x < results.length; x++) {
+                if (results[x].id == data["uac"]) {
+                  exist = true;
+                }
+              }
+              if (exist) {
+                connection.query(insertNewPatient, Object.values(data), (err) => {
+                  err
+                    ? res.status(500).send(err)
+                    : res
+                        .status(200)
+                        .send({
+                          status: 200,
+                          message: "Se insertaron los campos correctamente!",
+                        });
+                });
+              } else {
+                res
+                  .status(500)
+                  .send({
+                    status: 400,
+                    message: "El acudiente no existe en la BD",
+                  });
               }
             }
-            if (exist) {
-              connection.query(insertNewPatient, Object.values(data), (err) => {
-                err
-                  ? res.status(500).send(err)
-                  : res
-                      .status(200)
-                      .send({
-                        status: 200,
-                        message: "Se insertaron los campos correctamente!",
-                      });
-              });
-            } else {
-              res
-                .status(500)
-                .send({
-                  status: 400,
-                  message: "Algunos de los parametros son " + undefined,
-                });
-            }
-          }
-        });
+          });
+        }
       } else if (legal) {
-        connection.query(insertNewPatient, Object.values(data), (err) => {
+        connection.query(insertNewPatientlegal, Object.values(data), (err) => {
           err
             ? res.status(500).send(err)
             : res

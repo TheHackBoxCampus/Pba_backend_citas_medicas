@@ -7,9 +7,8 @@ let md_paciente = express();
 
 md_paciente.use((req, res, next) => {
   try {
-    let data = plainToClass(paciente, req.body, {
-      excludeExtraneousValues: true,
-    });
+    let data = plainToClass(paciente, req.body);
+    data.valdUac(); 
     req.body = JSON.parse(JSON.stringify(data));
     next();
   } catch (err) {
